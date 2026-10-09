@@ -146,4 +146,3 @@
   </tbody>
 </table>
 </div>
-<div class="flex justify-between"><span class="text-sm font-medium">Seat Number List</span><span class="text-sm font-medium">{data.length} rows</span></div>

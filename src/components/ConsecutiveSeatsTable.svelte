@@ -5,6 +5,11 @@
     FlexRender,
     tableFeatures,
     columnSizingFeature,
+    rowAggregationFeature,
+    aggregationFn_count,
+    aggregationFn_extent,
+    aggregationFn_mean,
+    aggregationFn_sum,
   } from '@tanstack/svelte-table'
   import type { ColumnDef } from '@tanstack/svelte-table'
   import { createVirtualizer } from '@tanstack/svelte-virtual'
@@ -16,6 +21,13 @@
 
   const features = tableFeatures({
     columnSizingFeature,
+    rowAggregationFeature,
+    aggregationFns: {
+      count: aggregationFn_count,
+      extent: aggregationFn_extent,
+      mean: aggregationFn_mean,
+      sum: aggregationFn_sum,
+    },
   })
 
   const columns: Array<ColumnDef<typeof features, ConsecutiveSeats>> = [
@@ -42,12 +54,19 @@
     {
       header: 'Leftmost',
       accessorKey: 'leftmostSeat.seatIndex',
-      size: 62,
+      size: 94,
     },
     {
       header: 'Rightmost',
       accessorKey: 'rightmostSeat.seatIndex',
-      size: 62,
+      size: 102,
+    },
+    {
+      header: 'Count',
+      accessorFn: (v) => v.rightmostSeat.seatIndex - v.leftmostSeat.seatIndex + 1,
+      size: 72,
+      aggregationFn: 'sum',
+      footer: ({ column }) => column.getAggregationValue<number>().toLocaleString(),
     },
   ]
 
@@ -134,6 +153,18 @@
       </tr>
     {/each}
   </tbody>
+  <tfoot>
+    {#each table.getFooterGroups() as footerGroup (footerGroup.id)}
+      <tr>
+        {#each footerGroup.headers as header (header.id)}
+          <th style='width:{header.column.getSize()}px;'>
+            {#if !header.isPlaceholder}
+              <FlexRender footer={header} />
+            {/if}
+          </th>
+        {/each}
+      </tr>
+    {/each}
+  </tfoot>
 </table>
 </div>
-<div class="flex justify-between"><span class="text-sm font-medium">Consecutive Seats List</span><span class="text-sm font-medium">{data.length} rows</span></div>

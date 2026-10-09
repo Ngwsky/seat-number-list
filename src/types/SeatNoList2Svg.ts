@@ -15,4 +15,15 @@
   export type ConsecutiveSeats = {
     leftmostSeat: SeatNo
     rightmostSeat: SeatNo
+    frontConsecutiveSeatsList?: Array<ConsecutiveSeats>
+    backConsecutiveSeatsList?: Array<ConsecutiveSeats>
+    subdivision?: Subdivision
+  }
+
+  export type Subdivision = {
+    consecutiveSeatsLists: Array<Array<ConsecutiveSeats>>
+    firstRow: number
+    lastRow: number
+    minSeatX: number
+    maxSeatX: number
   }
