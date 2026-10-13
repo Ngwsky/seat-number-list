@@ -5,59 +5,72 @@
     FlexRender,
     tableFeatures,
     columnSizingFeature,
+    rowAggregationFeature,
+    aggregationFn_count,
+    aggregationFn_extent,
+    aggregationFn_mean,
+    aggregationFn_sum,
   } from '@tanstack/svelte-table'
   import type { ColumnDef } from '@tanstack/svelte-table'
   import { createVirtualizer } from '@tanstack/svelte-virtual'
   import type { SeatNo } from '../types/SeatNoList2Svg'
-
 
   let { data = $bindable([])}: { data: Array<SeatNo> } = $props()
   let tableContainerRef = $state<HTMLDivElement | undefined>(undefined)
 
   const features = tableFeatures({
     columnSizingFeature,
+    rowAggregationFeature,
+    aggregationFns: {
+      count: aggregationFn_count,
+      extent: aggregationFn_extent,
+      mean: aggregationFn_mean,
+      sum: aggregationFn_sum,
+    },
   })
 
   const columns: Array<ColumnDef<typeof features, SeatNo>> = [
     {
       header: 'Key',
       accessorFn: (v) => v.area + ':' + v.block + ':' + v.row + ':' + v.seatIndex,
-      size: 96,
+      size: 120,
+      aggregationFn: 'count',
+      footer: ({ column }) => column.getAggregationValue<number>().toLocaleString(),
     },
     {
       header: 'Area',
       accessorKey: 'area',
-      size: 62,
+      size: 72,
     },
     {
       header: 'Block',
       accessorKey: 'block',
-      size: 68,
+      size: 80,
     },
     {
       header: 'Row',
       accessorKey: 'row',
-      size: 62,
+      size: 64,
     },
     {
       header: 'Seat',
       accessorKey: 'seatIndex',
-      size: 62,
+      size: 72,
     },
     {
       header: 'Offset',
       accessorKey: 'colOffset',
-      size: 74,
+      size: 88,
     },
     {
       header: 'Leftmost',
       accessorKey: 'isLeftmost',
-      size: 74,
+      size: 104,
     },
     {
       header: 'Rightmost',
       accessorKey: 'isRightmost',
-      size: 74,
+      size: 112,
     },
   ]
 
@@ -111,7 +124,7 @@
 </script>
 
 <div
-    class="overflow-auto h-96"
+    class="overflow-auto h-96 w-min"
     bind:this={tableContainerRef}
   >
 <table class="table table-pin-rows w-auto">
@@ -119,7 +132,7 @@
     {#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
       <tr>
         {#each headerGroup.headers as header (header.id)}
-          <th style='width:{header.column.getSize()}px;'>
+          <th style='min-width:{header.column.getSize()}px;' class="truncate">
             {#if !header.isPlaceholder}
               <FlexRender {header} />
             {/if}
@@ -137,12 +150,25 @@
         style="display: flex; position: absolute; transform: translateY({virtualRow.start}px); width: 100%;"
       >
         {#each row.getAllCells() as cell (cell.id)}
-          <td style="width:{cell.column.getSize()}px;" class={[typeof cell.getValue() === 'number' ? 'text-right': 'text-left' ]}>
+          <td style="min-width:{cell.column.getSize()}px;" class={[typeof cell.getValue() === 'number' ? 'text-right': 'text-left', 'truncate']}>
             <FlexRender {cell} />
           </td>
         {/each}
       </tr>
     {/each}
   </tbody>
+  <tfoot>
+    {#each table.getFooterGroups() as footerGroup (footerGroup.id)}
+      <tr>
+        {#each footerGroup.headers as header (header.id)}
+          <th style='min-width:{header.column.getSize()}px;' class="text-right truncate">
+            {#if !header.isPlaceholder}
+              <FlexRender footer={header} />
+            {/if}
+          </th>
+        {/each}
+      </tr>
+    {/each}
+  </tfoot>
 </table>
 </div>

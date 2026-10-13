@@ -1,5 +1,24 @@
 @import "tailwindcss";
+@theme {
+  --font-mono: "Google Sans Code", "M PLUS 1 Code", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace; 
+}
+
 @plugin "daisyui" {
   themes: light --default, dark --prefersdark;
 }
 @plugin "@iconify/tailwind4";
+
+@font-face {
+  font-family: "Google Sans Code";
+  font-style: normal;
+  font-weight: 100 700;
+  font-display: swap;
+  src: url("/fonts/GoogleSansCode-VariableFont_MONO,wght.ttf") format("truetype");
+}
+@font-face {
+  font-family: "M PLUS 1 Code";
+  font-style: normal;
+  font-weight: 100 700;
+  font-display: swap;
+  src: url("/fonts/MPLUS1Code-VariableFont_wght.ttf") format("truetype");
+}

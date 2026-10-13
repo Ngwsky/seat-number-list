@@ -18,7 +18,7 @@
   })
 </script>
 
-<label class="swap swap-rotate text-xl">
+<label class="swap swap-rotate text-xl px-2">
   <input type="checkbox" class="theme-controller" bind:checked={checked} value={isDefaultDark ? 'light' : 'dark'} />
   <span class={["icon-[ic--outline-light-mode]", isDefaultDark ? "swap-on" : "swap-off"]}></span>
   <span class={["icon-[ic--outline-dark-mode]", isDefaultDark ? "swap-off" : "swap-on"]}></span>

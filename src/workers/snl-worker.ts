@@ -1,8 +1,9 @@
 import { read, utils } from 'xlsx'
-import type { SeatNo, ConsecutiveSeats, Subdivision } from '../types/SeatNoList2Svg'
+import type { SeatNo, ConsecutiveSeats, Section } from '../types/SeatNoList2Svg'
 
-self.onmessage = (event: MessageEvent) => {
-  const workbook = read(event.data, { type: 'array' })
+self.onmessage = async (event: MessageEvent) => {
+  const ab = await event.data.arrayBuffer()
+  const workbook = read(ab, { type: 'array' })
   const firstSheetName = workbook.SheetNames[0]
   const worksheet = workbook.Sheets[firstSheetName]
   const jsonData = utils.sheet_to_json(worksheet, { header: 1 })
@@ -54,10 +55,13 @@ self.onmessage = (event: MessageEvent) => {
 
   const consecutiveSeatsList:Array<ConsecutiveSeats> = seatNoList.flatMap((s, i, a) => {
     if (s.isLeftmost) {
-      const r = a.slice(i).find(v => v.isRightmost)
-      if (r) return [{
+      const fromLeftmost = a.slice(i)
+      const rIdx = fromLeftmost.findIndex(v => v.isRightmost)
+      if (0 <= rIdx) return [{
+        row: s.row,
         leftmostSeat: s,
-        rightmostSeat: r
+        rightmostSeat: fromLeftmost[rIdx],
+        seatNoList: fromLeftmost.slice(0, rIdx + 1),
       }]
       else {
         console.log('Not find rightmost seat. leftmost: ', s)
@@ -100,21 +104,23 @@ self.onmessage = (event: MessageEvent) => {
     })
   })
 
-  const subdivisionList: Array<Subdivision> = []
+  const sectionList: Array<Section> = []
 
   consecutiveSeatsListInBlockMap.forEach((cslib) => {
     cslib.forEach((c, i, a) => {
-      if (!c.subdivision) {
-        const subdivision: Subdivision = {
+      if (!c.section) {
+        // Init Section Empty and Set Default Min Max first consecutive seats value.
+        const section: Section = {
           consecutiveSeatsLists: [],
           firstRow: c.leftmostSeat.row,
           lastRow: c.rightmostSeat.row,
           minSeatX: c.leftmostSeat.seatIndex + c.leftmostSeat.colOffset,
           maxSeatX: c.rightmostSeat.seatIndex + c.rightmostSeat.colOffset,
+          blockOptions: [],
         }
-        const cslInSubdivision = [...flattenFrontAndBackConsecutiveSeatsListGenerator(c)]
+        const cslInSection = [...flattenFrontAndBackConsecutiveSeatsListGenerator(c)]
         
-        cslInSubdivision.sort((a, b) => {
+        cslInSection.sort((a, b) => {
           const r = a.leftmostSeat.row - b.leftmostSeat.row
           if (r !== 0) return r
           return a.leftmostSeat.seatIndex - b.leftmostSeat.seatIndex
@@ -123,11 +129,11 @@ self.onmessage = (event: MessageEvent) => {
           const rx = v.rightmostSeat.seatIndex + v.rightmostSeat.colOffset
           const y = v.leftmostSeat.row
 
-          if (lx < subdivision.minSeatX) subdivision.minSeatX = lx
-          if (subdivision.maxSeatX < rx) subdivision.maxSeatX = rx
-          if (subdivision.lastRow < y) subdivision.lastRow = y
+          if (lx < section.minSeatX) section.minSeatX = lx
+          if (section.maxSeatX < rx) section.maxSeatX = rx
+          if (section.lastRow < y) section.lastRow = y
           
-          const cslInRow = subdivision.consecutiveSeatsLists.find(cssl => {
+          const cslInRow = section.consecutiveSeatsLists.find(cssl => {
             return cssl.some(csl => {
               return csl.leftmostSeat.row === v.leftmostSeat.row
             })
@@ -136,13 +142,13 @@ self.onmessage = (event: MessageEvent) => {
           if (cslInRow) {
             cslInRow.push(v)
           } else {
-            subdivision.consecutiveSeatsLists.push([v])
+            section.consecutiveSeatsLists.push([v])
           }
 
-          v.subdivision = subdivision
+          v.section = section
         })
 
-        subdivisionList.push(subdivision)
+        sectionList.push(section)
       }
     })
   })
@@ -150,7 +156,7 @@ self.onmessage = (event: MessageEvent) => {
   self.postMessage({
     seatNoList: seatNoList,
     consecutiveSeatsList: consecutiveSeatsList,
-    subdivisionList: subdivisionList,
+    sectionList: sectionList,
   })
 }
 

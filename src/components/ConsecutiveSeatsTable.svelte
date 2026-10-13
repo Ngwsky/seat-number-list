@@ -34,40 +34,47 @@
     {
       header: 'Key',
       accessorFn: (v) => v.leftmostSeat.area + ':' + v.leftmostSeat.block + ':' + v.leftmostSeat.row + ':' + v.leftmostSeat.seatIndex,
-      size: 96,
+      size: 120,
+      aggregationFn: 'count',
+      footer: ({ column }) => column.getAggregationValue<number>().toLocaleString(),
     },
     {
       header: 'Area',
       accessorKey: 'leftmostSeat.area',
-      size: 62,
+      size: 72,
     },
     {
       header: 'Block',
       accessorKey: 'leftmostSeat.block',
-      size: 68,
+      size: 80,
     },
     {
       header: 'Row',
       accessorKey: 'leftmostSeat.row',
-      size: 62,
+      size: 64,
     },
     {
       header: 'Leftmost',
       accessorKey: 'leftmostSeat.seatIndex',
-      size: 94,
+      size: 104,
     },
     {
       header: 'Rightmost',
       accessorKey: 'rightmostSeat.seatIndex',
-      size: 102,
+      size: 112,
     },
     {
       header: 'Count',
       accessorFn: (v) => v.rightmostSeat.seatIndex - v.leftmostSeat.seatIndex + 1,
-      size: 72,
+      size: 88,
       aggregationFn: 'sum',
       footer: ({ column }) => column.getAggregationValue<number>().toLocaleString(),
     },
+    {
+      header: 'Section',
+      accessorFn: (v) => v.section?.consecutiveSeatsLists[0][0].leftmostSeat.area + ':' + v.section?.consecutiveSeatsLists[0][0].leftmostSeat.block + ':' + v.section?.consecutiveSeatsLists[0][0].leftmostSeat.row + ':' + v.section?.consecutiveSeatsLists[0][0].leftmostSeat.seatIndex,
+      size: 120,
+    }
   ]
 
   const table = createTable({
@@ -120,7 +127,7 @@
 </script>
 
 <div
-    class="overflow-auto h-96"
+    class="overflow-auto h-96 w-min"
     bind:this={tableContainerRef}
   >
 <table class="table table-pin-rows w-auto">
@@ -128,7 +135,7 @@
     {#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
       <tr>
         {#each headerGroup.headers as header (header.id)}
-          <th style='width:{header.column.getSize()}px;'>
+          <th style='min-width:{header.column.getSize()}px;' class="truncate">
             {#if !header.isPlaceholder}
               <FlexRender {header} />
             {/if}
@@ -146,7 +153,7 @@
         style="display: flex; position: absolute; transform: translateY({virtualRow.start}px); width: 100%;"
       >
         {#each row.getAllCells() as cell (cell.id)}
-          <td style="width:{cell.column.getSize()}px;" class={[typeof cell.getValue() === 'number' ? 'text-right': 'text-left' ]}>
+          <td style="min-width:{cell.column.getSize()}px;" class={[typeof cell.getValue() === 'number' ? 'text-right': 'text-left', 'truncate']}>
             <FlexRender {cell} />
           </td>
         {/each}
@@ -157,7 +164,7 @@
     {#each table.getFooterGroups() as footerGroup (footerGroup.id)}
       <tr>
         {#each footerGroup.headers as header (header.id)}
-          <th style='width:{header.column.getSize()}px;'>
+          <th style='min-width:{header.column.getSize()}px;' class="text-right truncate">
             {#if !header.isPlaceholder}
               <FlexRender footer={header} />
             {/if}
