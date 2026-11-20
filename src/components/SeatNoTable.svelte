@@ -33,7 +33,7 @@
     {
       header: 'Key',
       accessorFn: (v) => v.area + ':' + v.block + ':' + v.row + ':' + v.seatIndex,
-      size: 120,
+      size: 136,
       aggregationFn: 'count',
       footer: ({ column }) => column.getAggregationValue<number>().toLocaleString(),
     },
@@ -147,6 +147,7 @@
       <tr
         data-index={virtualRow.index}
         use:measureElement
+        class="hover:bg-base-300"
         style="display: flex; position: absolute; transform: translateY({virtualRow.start}px); width: 100%;"
       >
         {#each row.getAllCells() as cell (cell.id)}

@@ -1,4 +1,4 @@
-import type { Block } from "../types/SeatNoList2Svg"
+/// <reference lib="webworker" />
 
 self.onmessage = (event: MessageEvent) => {
   const file = event.data
@@ -6,6 +6,6 @@ self.onmessage = (event: MessageEvent) => {
   const text = reader.readAsText(file, "utf-8")
 
   self.postMessage({
-    text: text
+    text: text,
   })
 }

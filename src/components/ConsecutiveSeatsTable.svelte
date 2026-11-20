@@ -34,7 +34,7 @@
     {
       header: 'Key',
       accessorFn: (v) => v.leftmostSeat.area + ':' + v.leftmostSeat.block + ':' + v.leftmostSeat.row + ':' + v.leftmostSeat.seatIndex,
-      size: 120,
+      size: 136,
       aggregationFn: 'count',
       footer: ({ column }) => column.getAggregationValue<number>().toLocaleString(),
     },
@@ -54,14 +54,14 @@
       size: 64,
     },
     {
-      header: 'Leftmost',
-      accessorKey: 'leftmostSeat.seatIndex',
-      size: 104,
+      header: 'Min X',
+      accessorFn: (v) => v.leftmostSeat.seatIndex + v.leftmostSeat.colOffset,
+      size: 80,
     },
     {
-      header: 'Rightmost',
-      accessorKey: 'rightmostSeat.seatIndex',
-      size: 112,
+      header: 'Max X',
+      accessorFn: (v) => v.rightmostSeat.seatIndex + v.rightmostSeat.colOffset,
+      size: 80,
     },
     {
       header: 'Count',
@@ -150,6 +150,7 @@
       <tr
         data-index={virtualRow.index}
         use:measureElement
+        class="hover:bg-base-300"
         style="display: flex; position: absolute; transform: translateY({virtualRow.start}px); width: 100%;"
       >
         {#each row.getAllCells() as cell (cell.id)}

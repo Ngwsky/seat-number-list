@@ -1,10 +1,7 @@
 ---
 import "../styles/global.css"
 // Component Imports
-import SeatNoList2Svg from "../components/SeatNoList2Svg.svelte"
-import Theme from "../components/Theme.svelte"
-import Footer from "../components/Footer.svelte"
-
+import Content from "./page.svelte"
 // Full Astro Component Syntax:
 // https://docs.astro.build/basics/astro-components/
 ---
@@ -23,29 +20,6 @@ import Footer from "../components/Footer.svelte"
   </head>
 
   <body>
-    <div class="min-h-screen pb-12">
-      <div class="navbar shadow-sm min-h-2">
-        <div class="flex-1">
-          <a class="btn btn-ghost text-md h-auto"
-            >Seat Number List to SVG</a
-          >
-        </div>
-        <div class="flex-none">
-          <Theme client:only="svelte" />
-        </div>
-      </div>
-      <div class="@container">
-        <div
-          class="flex flex-row flex-wrap m-auto w-full bg-base-200 font-mono"
-        >
-          <SeatNoList2Svg client:only="svelte" />
-        </div>
-      </div>
-      <footer
-        class="fixed bottom-0 left-0 w-full footer footer-horizontal bg-base-100 items-center px-4 py-2 z-50"
-      >
-        <Footer client:only="svelte" />
-      </footer>
-    </div>
+    <Content client:only="svelte" />
   </body>
 </html>

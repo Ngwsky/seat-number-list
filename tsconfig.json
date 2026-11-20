@@ -8,6 +8,7 @@
         "name": "@astrojs/ts-plugin"
       },
     ],
-    "lib": ["DOM", "DOM.Iterable", "ESNext", "WebWorker"]
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "types": ["@types/wicg-file-system-access"]
   }
 }
